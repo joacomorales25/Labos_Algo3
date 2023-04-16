@@ -14,11 +14,10 @@ void ordenar(vector<pair<pair<int,int>,int>>& v){
     });
 }
 
-vector<int> actividades(vector<pair<pair<int,int>,int>> v){
+vector<int> actividades(vector<pair<pair<int,int>,int>>& v){
     vector<int> res;
-    res.push_back(v[0].second);
-    pair<int,int> ultAct = v[0].first;
-    for(int i = 1; i < v.size();i++){
+    pair<int,int> ultAct = {-1,-1};
+    for(int i = 0; i < v.size();i++){
         if(v[i].first.first >= ultAct.second){
             res.push_back(v[i].second);
             ultAct = v[i].first;
@@ -44,10 +43,15 @@ int main(){
 
         ordenar(v);
         vector<int> res = actividades(v);
-        
-        for(int i = 0; i < res.size(); i++){
 
-            cout << res[i] << " ";
+        cout << res.size() << endl;
+        
+        for(int k = 0; k < res.size(); k++){
+            if(k == res.size()-1){
+                cout << res[k] << endl;
+                continue;
+            }
+            cout << res[k] << " ";
         }
     }
     return 0;
