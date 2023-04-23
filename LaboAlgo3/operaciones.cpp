@@ -1,54 +1,65 @@
+
 #include <iostream>
 #include <vector>
-#include <chrono>
 
 using namespace std;
 
+// Variables globales
+
+vector<vector<int>> dp;
+// Fin variables globales
 long long mod_bin_exp(long long x, long long y, long long n) {
+    
     if(y == 0){
         return 1;
-    } else if(y % 2 == 0){
+    }else{
         long long z = mod_bin_exp(x, y/2, n);
-        return (z*z) % n;
-    } else {
-        long long z = mod_bin_exp(x, y/2, n);
-        return ((z*z % n)*x) % n;
-    }
-}
-
-bool dp_mod_op(vector<int>& v, int m, int r) {
-    int n = v.size();
-    vector<vector<bool>> dp(n+1, vector<bool>(m+1, false));
-    dp[0][0] = true;
-    for (int i = 1; i <= n; i++) {
-        for (long long j = 0; j <= m; j++) {
-            dp[i][j] = dp[i][j] || dp[i-1][((j % m) * (v[i-1] % m)) % m];
-            dp[i][j] = dp[i][j] || dp[i-1][((j - v[i-1]) % m + m) % m];
-            dp[i][j] = dp[i][j] || dp[i-1][(j + (v[i-1] % m)) % m];
-            dp[i][j] = dp[i][j] || dp[i-1][mod_bin_exp(j, v[i-1], m) % m];
+        if(y % 2 == 0){
+            return (z*z) % n;
+        }else{
+            return  ((z*z % n)*x) % n;
         }
     }
-
-    return dp[n][r];
 }
 
-
+bool operaciones(vector<long long>& v, long long i, long long w, long long m, long long r){
+    if(i >= v.size()){
+        return w % m == r;
+    }else{
+        if(dp[i][w] != -1){
+            return dp[i][w];
+        }
+        bool res = false;
+        
+        res = res || operaciones(v, i+1, (w*v[i])%m, m, r);
+        res = res || operaciones(v, i+1, mod_bin_exp(w,v[i],m), m, r);
+        res = res || operaciones(v, i+1, ((w-v[i])%m + m)%m, m, r);
+        res = res || operaciones(v, i+1, (w+v[i])%m, m, r);
+        
+        dp[i][w] = res;
+        
+        return dp[i][w];
+        
+    }
+}
 
 int main(){
     int cantTests; cin >> cantTests;
     while(cantTests--){
     int n, r, m;
     cin >> n >> r >> m;
-    vector<int> v(n);
+    vector<long long> v(n);
     for(int i = 0; i < n; i++){
         cin >> v[i];
     }
-    bool res = dp_mod_op(v, m, r);
+    dp = vector<vector<int>>(n+1, vector<int>(m+1, -1));
+    bool res = operaciones(v, 1,v[0], m, r);
+
     if(res){
         cout << "Si" << endl;
     }else{
         cout << "No" << endl;
     }
     }
-    
+    return 0;
 }

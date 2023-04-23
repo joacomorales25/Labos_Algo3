@@ -34,12 +34,8 @@ void countingSort(vector<pair<pair<int,int>,int>>& v, int max_val){
     }
 }
 
-void ordenar(vector<pair<pair<int,int>,int>>& v){
-    int max_val = -1;
-    for(pair<pair<int,int>,int> p: v){
-        max_val = max(max_val, p.first.second);
-    }
-    countingSort(v, max_val);
+void ordenar(vector<pair<pair<int,int>,int>>& v, int max){
+    countingSort(v, max);
 }
 
 vector<int> actividades(vector<pair<pair<int,int>,int>>& v){
@@ -57,26 +53,49 @@ vector<int> actividades(vector<pair<pair<int,int>,int>>& v){
 
 int main(){
     // Open input file
-    int numActividades;
-    cin >> numActividades;
-    vector<pair<pair<int,int>,int>> v;
-    for(int j = 1; j <= numActividades; j++){
-        int inicio, fin;
-        cin >> inicio >> fin;
-        v.push_back(make_pair(make_pair(inicio, fin),j));
+    ifstream inputFile("runtime_sorted.csv");
+    if(!inputFile){
+        cerr << "Error: Unable to open input file." << endl;
+        return 1;
     }
-    ordenar(v);
-    vector<int> res = actividades(v);
 
-    cout << res.size() << endl;
-    
-    for(int k = 0; k < res.size(); k++){
-        if(k == res.size()-1){
-            cout << res[k] << endl;
-            continue;
-        }
-        cout << res[k] << " ";
+    // Open output file
+    ofstream outputFile("output.txt");
+    if(!outputFile){
+        cerr << "Error: Unable to open output file." << endl;
+        return 1;
     }
+
+    int numTests, intentos;
+    inputFile >> numTests;
+    inputFile >> intentos;
+    for(int i = 1; i <= numTests; i++){
+        for(int j = 0; j < intentos; j++){
+            int numActividades;
+            inputFile >> numActividades;
+            vector<pair<pair<int,int>,int>> v;
+            int max_val = -1;
+            for(int j = 0; j < numActividades; j++){
+                int inicio, fin;
+                inputFile >> inicio >> fin;
+                if(fin > max_val)
+                    max_val = fin;
+                v.push_back(make_pair(make_pair(inicio, fin),j+1));
+            }
+            auto start = chrono::high_resolution_clock::now();
+            ordenar(v, max_val);
+            vector<int> res = actividades(v);
+            auto end = chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+
+
+            outputFile << numActividades << endl;
+            outputFile << duration.count() << endl;
+        }
+    }
+
+    inputFile.close();
+    outputFile.close();
 
     return 0;
 }
