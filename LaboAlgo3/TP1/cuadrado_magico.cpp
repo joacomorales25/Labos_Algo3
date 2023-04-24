@@ -9,7 +9,7 @@ vector<int> sumaDiag;
 vector<int> num;
 int tam;
 int cteMagica;
-bool poda(vector<vector<int>>& m, int i, int j, int k){
+bool poda(int i, int j, int k){
     
     // chequeo el valor de la fila en la que estoy parado
     if(sumaFila[i] + k > cteMagica){
@@ -64,7 +64,7 @@ bool esMagico(vector<vector<int>>& m, int N){
 }
 
 
-bool sigoBien(vector<vector<int>>& m, int i, int j, int k){
+bool sigoBien(int i, int j, int k){
 
     // si termino una columna
     if(i == tam-1){
@@ -88,7 +88,7 @@ bool sigoBien(vector<vector<int>>& m, int i, int j, int k){
 }
 
 
-bool noPuedoCol(vector<vector<int>> &m, int i, int j, int k){
+bool noPuedoCol(int j, int k){
     if(cteMagica-sumaCol[j] - k > tam*tam || cteMagica-sumaCol[j]-k < 0){
         return true;
     }else{
@@ -96,7 +96,7 @@ bool noPuedoCol(vector<vector<int>> &m, int i, int j, int k){
     }
 }
 
-bool noPuedoFila(vector<vector<int>> &m, int i, int j, int k){
+bool noPuedoFila(int i, int k){
     if(cteMagica-sumaFila[i] - k > tam*tam || cteMagica-sumaFila[i]-k < 0){
         return true;
     }else{
@@ -124,14 +124,14 @@ int contar_cm(vector<vector<int>>& m, int i, int j, vector<vector<int>> &res, in
         int cont = 0;
         for(int k = 1; k <= (tam)*tam; k++){
             
-            if(num[k] == 0 && poda(m, i, j, k) && sigoBien(m, i, j, k)){
+            if(num[k] == 0 && poda(i, j, k) && sigoBien(i, j, k)){
                 if(i == tam-2){
-                    if(noPuedoCol(m, i, j, k)){
+                    if(noPuedoCol(j, k)){
                         continue;
                     }
                 }
                 if(j == tam-2){
-                    if(noPuedoFila(m, i, j, k)){
+                    if(noPuedoFila(i, k)){
                         continue;
                     }
                 }

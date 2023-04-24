@@ -53,24 +53,22 @@ vector<int> actividades(vector<pair<pair<int,int>,int>>& v){
 
 int main(){
     // Open input file
-    ifstream inputFile("runtime_sorted.csv");
+    ifstream inputFile("iguales.txt");
     if(!inputFile){
         cerr << "Error: Unable to open input file." << endl;
         return 1;
     }
 
     // Open output file
-    ofstream outputFile("output.txt");
+    ofstream outputFile("output_iguales.txt");
     if(!outputFile){
         cerr << "Error: Unable to open output file." << endl;
         return 1;
     }
 
-    int numTests, intentos;
+    int numTests;
     inputFile >> numTests;
-    inputFile >> intentos;
     for(int i = 1; i <= numTests; i++){
-        for(int j = 0; j < intentos; j++){
             int numActividades;
             inputFile >> numActividades;
             vector<pair<pair<int,int>,int>> v;
@@ -86,13 +84,11 @@ int main(){
             ordenar(v, max_val);
             vector<int> res = actividades(v);
             auto end = chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
 
-            outputFile << numActividades << endl;
-            outputFile << duration.count() << endl;
+            outputFile << numActividades << " " << duration.count() << endl;
         }
-    }
 
     inputFile.close();
     outputFile.close();

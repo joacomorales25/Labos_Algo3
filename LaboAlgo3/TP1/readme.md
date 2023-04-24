@@ -1,0 +1,1 @@
+Para correr los ejercicios, primero hay que compilarlos haciendo uso del makefile que dejamos para simplificar. Haciendo "make all" se compilan todos juntos, luego para ejecutarlos, basta con hacer "./eji" para el ejercicio i.
