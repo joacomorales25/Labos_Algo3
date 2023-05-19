@@ -48,21 +48,21 @@ def rand_input():
 def txtToCsv():
     
     df = pd.read_csv('output.txt', sep=" ", header=None)
-    df2 = pd.read_csv('output_order.txt', sep=" ", header=None)
-    df3 = pd.read_csv('output_iguales.txt', sep=" ", header=None)
+    #df2 = pd.read_csv('output_order.txt', sep=" ", header=None)
+    #df3 = pd.read_csv('output_iguales.txt', sep=" ", header=None)
     df.columns = ["size", "time"]
-    df2.columns = ["size", "time"]
-    df3.columns = ["size", "time"]
+    #df2.columns = ["size", "time"]
+    #df3.columns = ["size", "time"]
     df['time'] = df['time']/1000000
-    df2['time'] = df2['time']/1000000
-    df3['time'] = df3['time']/1000000
+    #df2['time'] = df2['time']/1000000
+    #df3['time'] = df3['time']/1000000
     df = np.log(df)
-    df2 = np.log(df2)
-    df3 = np.log(df3)
+    #df2 = np.log(df2)
+    #df3 = np.log(df3)
 
     plt.plot(df['size'],df['time'], label='Actividades randoms')
-    plt.plot(df2['size'],df2['time'], label='Actividades ordenadas')
-    plt.plot(df3['size'],df3['time'], label='Actividades iguales')
+    #plt.plot(df2['size'],df2['time'], label='Actividades ordenadas')
+    #plt.plot(df3['size'],df3['time'], label='Actividades iguales')
     plt.title('Tiempos de ejecución del algoritmo')
     plt.xlabel('Tamaño de entrada')
     plt.ylabel('Tiempo (segundos)')
