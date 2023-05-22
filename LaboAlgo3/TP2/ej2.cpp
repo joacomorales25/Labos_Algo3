@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <queue>
 
 using namespace std;
 
@@ -19,34 +21,67 @@ void dfs(Grafo &g, int u, vector<int> &visitado){
     visitado[u] = VISITADO;
 }
 
+void BFS(Grafo &g, int u, vector<int> &visitado){
+
+    queue<int> q;
+    q.push(u);
+    visitado[u] = EN_PROCESO;
+
+    while(!q.empty()){
+        int v = q.front(); q.pop();
+        for(int w : g[v]){
+            if(visitado[w] == NO_VISITADO){
+                visitado[w] = EN_PROCESO;
+                q.push(w);
+            }
+        }
+        visitado[v] = VISITADO;
+    }
+}
+
 int main(){
 
     int nodos, aristas; cin >> nodos >> aristas;
 
     Grafo g(nodos+1);
+    vector<int> d_in(nodos+1, 0);
+    vector<int> d_out(nodos+1, 0);
+
     vector<int> visitado(nodos+1, 0);
     for (int i = 0; i < aristas; i++){
         int u, v; cin >> u >> v;
         g[u].push_back(v);
+        d_in[v]++;
+        d_out[u]++;
     }
-    int componentes = 0;
-    vector<int> menores;
+    int src = 1;
     for(int i = 1; i <= nodos; i++){
-
-        if(visitado[i] == NO_VISITADO){
-            menores.push_back(i);
-            componentes++;
-            dfs(g, i, visitado);
+        if(d_in[i] == 0){
+            src = i;
         }
     }
-    cout << componentes << endl;
+    vector<int> res;
+    BFS(g, src, visitado);
+    res.push_back(src);
+    int componentes = 1;
+    for (int i = 1; i <= nodos; i++){
+        if(visitado[i] == NO_VISITADO && (d_out[i] > 0 || (d_in[i] == 0 && d_out[i] == 0))){
+            componentes++;
+            res.push_back(i);
+            BFS(g, i, visitado);
+            
+        }
+    }
 
-    for(int i = 0; i < menores.size(); i++){
-        cout << menores[i];
-        if(i != menores.size()-1)
-            cout << " ";
+    sort(res.begin(), res.end());
+
+    cout << componentes << endl;
+    for(int i : res){
+        cout << i << " ";
     }
     cout << endl;
 
+    return 0;
 
 }
+
