@@ -16,7 +16,7 @@ const ll inf = 1e18;
 vector<vector<int>> loc;
 int nro_test;
 int test;
-int n,r,w,u,v;
+int n,r,w,UTP,FO;
 vector<tuple<double,int,int, int>> E;
 int componentes;
 double Pu, Pv;
@@ -47,33 +47,14 @@ struct DSU{
     vector<int> rank;
 };
 
-void printVector(const std::vector<std::vector<int>>& vec) {
-    for (const auto& innerVec : vec) {
-        for (const auto& element : innerVec) {
-            std::cout << element << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-
-void printTripla(const std::vector<std::tuple<ll, int, int>>& vec) {
-    for (const auto& element : vec) {
-        ll value = std::get<0>(element);
-        int secondValue = std::get<1>(element);
-        int thirdValue = std::get<2>(element);
-        
-        std::cout << value << " " << secondValue << " " << thirdValue << std::endl;
-    }
-}
-
 double distancia_euclidea(double x0, double x1, double y0, double y1) {
     double deltaX = x0 - y0;
     double deltaY = x1 - y1;
     
-    return std::sqrt(deltaX * deltaX + deltaY * deltaY);
+    return std::sqrt((deltaX * deltaX) + (deltaY * deltaY));
 }
 
-vector<tuple<double,int,int, int>> crear_grafo(vector<vector<int>> nodos){
+vector<tuple<double,int,int, int>> crear_grafo(vector<vector<int>>& nodos){
     vector<tuple<double,int,int, int>> E;
     double c;            // precio del cable
     int tipoDeCable; // 0 si es UTP, 1 si es Fibra Optica                                
@@ -85,12 +66,12 @@ vector<tuple<double,int,int, int>> crear_grafo(vector<vector<int>> nodos){
 
                 int x2=nodos[j][0];
                 int y2=nodos[j][1];
-                int d = distancia_euclidea(x1,y1,x2,y2);
+                double d = distancia_euclidea(x1,y1,x2,y2);
                 if (d<=r){
-                    c = u*d;
+                    c = UTP*d;
                     tipoDeCable = 0;
                 }else{
-                    c = v*d;
+                    c = FO*d;
                     tipoDeCable = 1;
                 }
                 E.push_back({c,i,j, tipoDeCable});
@@ -109,18 +90,21 @@ void kruskal(){
     double res = 0;
     int aristas = 0;
     DSU dsu(n);
-    for(auto [c,u,v,tc] : E){
+    for(auto e: E){
+        double c;
+        int tc;
+        int x_1, x_2;
+        tie(c,x_1,x_2,tc) = e;
         //si (u,v) es arista segura
-        if(dsu.find(u) != dsu.find(v)){
+        if(dsu.find(x_1) != dsu.find(x_2)){
             // agregar
-            dsu.unite(u,v);
+            dsu.unite(x_1,x_2);
             if (tc == 0){
                 Pu += c;
             }else{
                 Pv += c;
             }
             aristas++;
-            res += c;
             componentes--;     // me disminuye la cantidad de componentes
             if (componentes==w){ // salgo del for
                 break;
@@ -128,27 +112,20 @@ void kruskal(){
         }
     }
 
-    if(aristas == n-w) cout<<std::fixed << std::setprecision(3) << "Caso #"<< test << ": " << Pu << " " << Pv  << endl;
-    else cout<<"IMPOSSIBLE\n";
     
-    
-
 }
-
-
-
+               
 
 int main() {
-    cin>> nro_test ;
+    cin>> nro_test;
 
     for (int i = 0; i < nro_test; i++)
     {
-        test ++;
         Pu=0;
         Pv=0;
-        cin>>n>>r>>w>>u>>v;
+        cin>>n>>r>>w>>UTP>>FO;
         componentes = n;
-        for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
         int x,y;
         cin>>x>>y;
         loc.push_back({x, y});
@@ -156,12 +133,9 @@ int main() {
         }
     E = crear_grafo(loc);
     kruskal();
+    cout<<std::fixed << std::setprecision(3) << "Caso #"<< (i+1) << ": " << Pu << " " << Pv  << endl;
+    loc.clear();
     }
     
-
-    //printTripla(E);
-    //cout<<componentes<<endl;
-
-    //printTripla(crear_grafo(loc));
     return 0;
 }
