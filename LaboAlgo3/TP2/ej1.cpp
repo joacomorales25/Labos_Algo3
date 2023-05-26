@@ -96,7 +96,8 @@ int main(){
 
     detectarPuentes(g, 1, parent, discTime);
     
-        //corremos DFS para obtener la info necesaria para detectar puentes
+     // una vez que tenemos los puentes, hacemos un dfs que cuenta la cantidad de elementos por componente conexa que se genere ignorando los puentes
+    
     estado = vector<int>(nodos+1, NO_VISITADO);
     for(int i = 1; i <= nodos; i++){
         if(estado[i] == NO_VISITADO){
@@ -105,7 +106,7 @@ int main(){
         }
     }
     long long formas_de_ganar = 0;
-
+    // luego la probabilidad de ganar son las formas de elegir la sumatoria de n choose 2 por cada componente conexa.
     for(int i = 0; i < elems.size(); i++){
         
         formas_de_ganar += ((long long)elems[i]*(long long)(elems[i]-1))/2;
