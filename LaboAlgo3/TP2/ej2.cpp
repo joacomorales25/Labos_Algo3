@@ -9,18 +9,6 @@ using namespace std;
 
 enum{NO_VISITADO, VISITADO, EN_PROCESO};
 
-void dfs(Grafo &g, int u, vector<int> &visitado){
-
-    visitado[u] = EN_PROCESO;
-
-    for(int v : g[u]){
-        if(visitado[v] == NO_VISITADO){
-            dfs(g, v, visitado);
-        }
-    }
-    visitado[u] = VISITADO;
-}
-
 void BFS(Grafo &g, int u, vector<int> &visitado){
 
     queue<int> q;
@@ -56,7 +44,7 @@ int main(){
     }
     int src = 1;
     for(int i = 1; i <= nodos; i++){
-        if(d_in[i] == 0){
+        if(d_in[i] == 0){ // los que si o si van a entrar primero son los que tienen grado de entrada 0, i.e, nadie los tira.
             src = i;
         }
     }
@@ -65,7 +53,8 @@ int main(){
     res.push_back(src);
     int componentes = 1;
     for (int i = 1; i <= nodos; i++){
-        if(visitado[i] == NO_VISITADO && (d_out[i] > 0 || (d_in[i] == 0 && d_out[i] == 0))){
+        if(visitado[i] == NO_VISITADO && (d_out[i] > 0 || (d_in[i] == 0 && d_out[i] == 0))){ // me fijo de agarrar los que aun no haya visitado
+            // que tengan grado de salida mayor a 0, o sean noditos solos.
             componentes++;
             res.push_back(i);
             BFS(g, i, visitado);
