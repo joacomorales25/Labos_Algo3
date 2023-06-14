@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -5,10 +6,10 @@
 #include <math.h>
 #include <utility>
 #include <set>
-#define INF 10000000
+#include <chrono>
+#include <fstream>
 
 using namespace std;
-
 
 typedef pair<int, int> infoDist;       //el primer elemento corresponde a la distancia computada. El segundo corresponde al nodo.
 
@@ -20,43 +21,59 @@ struct arista{
     int peso;
 };
 
-void Dijkstra(const vector<vector<pair<int,int>>> &ady, int s, vector<int> &dist){
-    dist[s] = 0;
-    priority_queue<infoDist , vector<infoDist>, greater<infoDist>> Q;
+const int INF = 1000000000;
+vector<vector<pair<int, int>>> adj;
 
-    for (int v = 0; v < ady.size(); v++)
-        Q.push(make_pair(dist[v], v));
+void dijkstra(int s, vector<int> & d, vector<int> & p) {
+    int n = adj.size();
+    d.assign(n, INF);
+    p.assign(n, -1);
+    vector<bool> u(n, false);
 
-    while(!Q.empty()){
-        infoDist infoU = Q.top();
-        Q.pop();
-        int u = infoU.second;
-        for (auto edge : ady[u]){
-            int v = edge.first;
-            int peso = edge.second;
-            if (dist[u] < INF && dist[v] > dist[u] + peso){
-                dist[v] = dist[u] + peso;
-                Q.push(make_pair(dist[v], v));
+    d[s] = 0;
+    for (int i = 0; i < n; i++) {
+        int v = -1;
+        for (int j = 0; j < n; j++) {
+            if (!u[j] && (v == -1 || d[j] < d[v]))
+                v = j;
+        }
+
+        if (d[v] == INF)
+            break;
+
+        u[v] = true;
+        for (auto edge : adj[v]) {
+            int to = edge.first;
+            int len = edge.second;
+
+            if (d[v] + len < d[to]) {
+                d[to] = d[v] + len;
+                p[to] = v;
             }
         }
     }
 }
 
 int main(){
+    ifstream inputFile("test.txt");
 
-    int numCasos; cin >> numCasos;
+    ofstream outputFile("tiempos_n_2.txt");
+
+    int numCasos; inputFile >> numCasos;
 
     while(numCasos--){
         int nodos, aristas, k, origen, destino;
-        cin >> nodos >> aristas >> k >> origen >> destino;
+        inputFile >> nodos >> aristas >> k >> origen >> destino;
 
         vector<vector<pair<int,int>>> ady(nodos+1);
         vector<vector<pair<int,int>>> ady_inv(nodos+1);
 
+        adj = vector<vector<pair<int, int>>>(nodos+1);
+
         for(int i = 0; i < aristas; i++){
             int u, v, peso;
-            cin >> u >> v >> peso;
-            ady[u].push_back(make_pair(v, peso));
+            inputFile >> u >> v >> peso;
+            adj[u].push_back(make_pair(v, peso));
             ady_inv[v].push_back(make_pair(u, peso));
 
         }
@@ -65,14 +82,20 @@ int main(){
 
         for(int i = 0; i < k; i++){
             int u, v, peso;
-            cin >> u >> v >> peso;
+            inputFile >> u >> v >> peso;
             aristas_especiales.push_back(make_pair(make_pair(u,v), peso));
         }
         vector<int> dist_src(nodos+1, INF);
         vector<int> dist_dst(nodos+1, INF);
 
-        Dijkstra(ady, origen, dist_src);
-        Dijkstra(ady_inv, destino, dist_dst);
+        vector<int> predecesor(nodos+1, -1);
+
+        auto start = chrono::steady_clock::now();
+        dijkstra(origen, dist_src, predecesor);
+        adj = ady_inv;
+        dijkstra(destino, dist_dst, predecesor);
+        auto end = chrono::steady_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
 
         int minimo = INF;
 
@@ -89,5 +112,6 @@ int main(){
         }
 
         minimo == INF ? cout << -1 << endl : cout << minimo << endl;
+        outputFile << nodos << " " << duration.count() << endl;
     }
 }

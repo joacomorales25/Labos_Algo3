@@ -3,6 +3,8 @@
 #include <queue>
 #include <limits>
 #include <math.h>
+#include <fstream>
+#include <chrono>
 #include <utility>
 #include <set>
 #define INF 10000000
@@ -44,18 +46,27 @@ void Dijkstra(const vector<vector<pair<int,int>>> &ady, int s, vector<int> &dist
 
 int main(){
 
-    int numCasos; cin >> numCasos;
+    ifstream inputFile("test.txt");
+
+    ofstream outputFile("tiempos_log_n.txt");
+
+    if (!outputFile){
+        cout << "Error al abrir el archivo" << endl;
+        return 1;
+    }
+
+    int numCasos; inputFile >> numCasos;
 
     while(numCasos--){
         int nodos, aristas, k, origen, destino;
-        cin >> nodos >> aristas >> k >> origen >> destino;
+        inputFile >> nodos >> aristas >> k >> origen >> destino;
 
         vector<vector<pair<int,int>>> ady(nodos+1);
         vector<vector<pair<int,int>>> ady_inv(nodos+1);
 
         for(int i = 0; i < aristas; i++){
             int u, v, peso;
-            cin >> u >> v >> peso;
+            inputFile >> u >> v >> peso;
             ady[u].push_back(make_pair(v, peso));
             ady_inv[v].push_back(make_pair(u, peso));
 
@@ -65,14 +76,17 @@ int main(){
 
         for(int i = 0; i < k; i++){
             int u, v, peso;
-            cin >> u >> v >> peso;
+            inputFile >> u >> v >> peso;
             aristas_especiales.push_back(make_pair(make_pair(u,v), peso));
         }
+        
         vector<int> dist_src(nodos+1, INF);
         vector<int> dist_dst(nodos+1, INF);
-
+        auto start = chrono::steady_clock::now();
         Dijkstra(ady, origen, dist_src);
         Dijkstra(ady_inv, destino, dist_dst);
+        auto end = chrono::steady_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
 
         int minimo = INF;
 
@@ -88,6 +102,8 @@ int main(){
             // me quedo con el valor anterior, o considero el camino normal, o el camino con una arista especial normal o invertida. 
         }
 
-        minimo == INF ? cout << -1 << endl : cout << minimo << endl;
+        //minimo == INF ? cout << -1 << endl : cout << minimo << endl;
+        
+        outputFile << nodos << " " << duration.count() << endl;
     }
 }
