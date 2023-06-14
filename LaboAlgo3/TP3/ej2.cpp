@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-
+#include<bits/stdc++.h>
 
 using namespace std;
 
@@ -55,36 +55,37 @@ int maxflow(int s, int t) {
     return flow;
 }
 
-
-
 int main(){
 
-    int n, m; 
-
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     while(true){
 
-        cin >> n >> m;
+        int nodos, m; cin >> nodos >> m;
 
-        if(n == 0 && m == 0) break;
+        if(nodos == 0 && m == 0) break;
 
-        vector<int> preferencias(n+1, 0);
+        n = nodos;
 
-        for(int i = 1; i <= n; i++){
+        vector<int> preferencias(nodos+1, 0);
+
+        for(int i = 1; i <= nodos; i++){
             cin >> preferencias[i]; // les gusta prim o kruskal. Prim = 1, Kruskal = 0
         }
 
-        vector<int> ady[n+1];
+        adj = vector<vector<int>>(nodos+2);
+        capacity = vector<vector<int>>(nodos+2, vector<int>(nodos+2,0));
 
         for(int i = 0; i < m; i++){
             int u, v;
             cin >> u >> v;
-            ady[u].push_back(v);
-            ady[v].push_back(u);
+            adj[u].push_back(v);
+            adj[v].push_back(u);
         }
         vector<int> grupoA;
         vector<int> grupoB;
 
-        for(int i = 1; i <= n; i++){
+        for(int i = 1; i <= nodos; i++){
             if(preferencias[i]){
                 grupoA.push_back(i);
             }else{
@@ -93,45 +94,35 @@ int main(){
         }
 
         int src = 0;
-        int dst = n+1;
+        int dst = nodos+1;
 
-        vector<vector<int>> red(n+2);
+        for(auto& elem : grupoA){
 
-        for(int i = 0; i < grupoA.size(); i++){
-            red[src].push_back(grupoA[i]);
+            adj[src].push_back(elem);
+            capacity[src][elem] = 1;
+
         }
-        for(int i = 0; i < grupoA.size(); i++){
-            for(int j = 0; j < ady[grupoA[i]].size(); j++){
-                red[grupoA[i]].push_back(ady[grupoA[i]][j]);
+
+        for(auto& elem : grupoB){
+
+            adj[elem].push_back(dst);
+            capacity[elem][dst] = 1;
+        }
+        
+        for(int i = 1; i <= nodos;i++){
+            for(auto& vecinos: adj[i]){
+
+                capacity[i][vecinos] = 1;
+                capacity[vecinos][i] = 1;
             }
         }
 
-        for(int i = 0; i < grupoB.size(); i++){
-            for(int j = 0; j < ady[grupoB[i]].size(); j++){
-                red[grupoB[i]].push_back(dst);
-            }
-        }
-
-        capacity = vector<vector<int>>(n+2, vector<int>(n+2, 0));
-
-        for(int i = 0; i < grupoB.size(); i++){
-            capacity[grupoB[i]][dst] = 1;
-        }
-
-        for(int i = 0; i < grupoA.size(); i++){
-            for(int j = 0; j < ady[grupoA[i]].size(); j++){
-                capacity[grupoA[i]][ady[grupoA[i]][j]] = 1;
-            }
-        }
-
-        for(int i = 0; i < grupoA.size(); i++){
-            capacity[src][grupoA[i]] = 1;
-        }
-
-        adj = red;
         cout << maxflow(src, dst) << endl;
 
-
-
+        adj.clear();
+        capacity.clear();
+        grupoA.clear();
+        grupoB.clear();
+        preferencias.clear();
     }
 }

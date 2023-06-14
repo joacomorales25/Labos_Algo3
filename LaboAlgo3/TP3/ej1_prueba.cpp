@@ -7,6 +7,7 @@
 #include <utility>
 #include <set>
 #include <chrono>
+#include <map>
 #include <fstream>
 
 using namespace std;
@@ -61,6 +62,8 @@ int main(){
 
     int numCasos; inputFile >> numCasos;
 
+    map<int,chrono::microseconds> promedios;
+
     while(numCasos--){
         int nodos, aristas, k, origen, destino;
         inputFile >> nodos >> aristas >> k >> origen >> destino;
@@ -85,17 +88,27 @@ int main(){
             inputFile >> u >> v >> peso;
             aristas_especiales.push_back(make_pair(make_pair(u,v), peso));
         }
+
+        for(int i = 0; i < 10;i++){
         vector<int> dist_src(nodos+1, INF);
         vector<int> dist_dst(nodos+1, INF);
 
         vector<int> predecesor(nodos+1, -1);
 
+        
         auto start = chrono::steady_clock::now();
         dijkstra(origen, dist_src, predecesor);
         adj = ady_inv;
         dijkstra(destino, dist_dst, predecesor);
         auto end = chrono::steady_clock::now();
         auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+        
+        if(promedios.count(nodos)){
+            chrono::microseconds tiempo = promedios[nodos];
+            tiempo += duration;
+        }else{
+            promedios.insert(make_pair(nodos,duration));
+        }
 
         int minimo = INF;
 
@@ -112,6 +125,15 @@ int main(){
         }
 
         minimo == INF ? cout << -1 << endl : cout << minimo << endl;
-        outputFile << nodos << " " << duration.count() << endl;
+        }
+        
+    }
+
+    for(auto& keys : promedios){
+
+        chrono::microseconds res = keys.second/10;
+
+        outputFile << keys.first << " " << res.count() << endl;
+
     }
 }

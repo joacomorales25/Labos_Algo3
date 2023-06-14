@@ -5,6 +5,7 @@
 #include <math.h>
 #include <fstream>
 #include <chrono>
+#include <map>
 #include <utility>
 #include <set>
 #define INF 10000000
@@ -50,6 +51,8 @@ int main(){
 
     ofstream outputFile("tiempos_log_n.txt");
 
+    map<int,chrono::microseconds> promedios;
+
     if (!outputFile){
         cout << "Error al abrir el archivo" << endl;
         return 1;
@@ -80,6 +83,7 @@ int main(){
             aristas_especiales.push_back(make_pair(make_pair(u,v), peso));
         }
         
+        for(int i = 0; i < 10;i++){
         vector<int> dist_src(nodos+1, INF);
         vector<int> dist_dst(nodos+1, INF);
         auto start = chrono::steady_clock::now();
@@ -87,6 +91,13 @@ int main(){
         Dijkstra(ady_inv, destino, dist_dst);
         auto end = chrono::steady_clock::now();
         auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+
+        if(promedios.count(nodos)){
+            chrono::microseconds tiempo = promedios[nodos];
+            tiempo += duration;
+        }else{
+            promedios.insert(make_pair(nodos,duration));
+        }
 
         int minimo = INF;
 
@@ -103,7 +114,15 @@ int main(){
         }
 
         //minimo == INF ? cout << -1 << endl : cout << minimo << endl;
+        }
         
-        outputFile << nodos << " " << duration.count() << endl;
+    }
+
+    for(auto& keys : promedios){
+
+        chrono::microseconds res = keys.second/10;
+
+        outputFile << keys.first << " " << res.count() << endl;
+
     }
 }
